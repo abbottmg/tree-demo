@@ -52,6 +52,29 @@ kotlin {
 	}
 }
 
+jooq {
+	configuration {
+		jdbc {
+			//driver = "org.postgresql.Driver"
+			url = "jdbc:postgresql://aws-0-ca-central-1.pooler.supabase.com/postgres"
+			user = "postgres.otvzmnexcifgmdtyuhvb"
+		}
+		generator {
+			name = "org.jooq.codegen.KotlinGenerator"
+			target {
+				packageName = "codes.abbott.TreeDemo.tables"
+				directory = "build/generated/source/jooq/main"
+				//clean = true
+			}
+			database {
+				name = "org.jooq.meta.postgres.PostgresDatabase"
+				includes = "public.edge"
+				excludes = ""
+			}
+		}
+	}
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
