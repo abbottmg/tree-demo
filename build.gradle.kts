@@ -62,14 +62,19 @@ jooq {
 		generator {
 			name = "org.jooq.codegen.KotlinGenerator"
 			target {
-				packageName = "codes.abbott.TreeDemo.tables"
-				directory = "build/generated/source/jooq/main"
+				packageName = "codes.abbott.TreeDemo.db"
+				directory = "src/main/kotlin/codes/abbott/TreeDemo/generated"
 				//clean = true
 			}
 			database {
 				name = "org.jooq.meta.postgres.PostgresDatabase"
 				includes = "public.edge"
 				excludes = ""
+			}
+			generate {
+				isDeprecated = false
+				isPojosAsKotlinDataClasses = true
+				isFluentSetters = true
 			}
 		}
 	}
