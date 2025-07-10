@@ -73,6 +73,7 @@ jooq {
 			}
 			generate {
 				isDeprecated = false
+				isPojos = true
 				isPojosAsKotlinDataClasses = true
 				isFluentSetters = true
 			}

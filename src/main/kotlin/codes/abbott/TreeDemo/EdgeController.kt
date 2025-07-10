@@ -1,5 +1,6 @@
 package codes.abbott.TreeDemo
 
+import codes.abbott.TreeDemo.db.public.tables.pojos.Edge
 import codes.abbott.TreeDemo.db.public.tables.records.EdgeRecord
 import codes.abbott.TreeDemo.db.public.tables.references.EDGE
 import org.jooq.DSLContext
@@ -16,6 +17,11 @@ class EdgeController(
 	@Autowired
 	var jooq: DSLContext
 ) {
+
+	@GetMapping("/")
+	fun listAll(): List<Edge> {
+		return jooq.selectFrom(EDGE).fetchInto(Edge::class.java)
+	}
 
 	@PostMapping("/{from}/{to}")
 	fun createEdge(
