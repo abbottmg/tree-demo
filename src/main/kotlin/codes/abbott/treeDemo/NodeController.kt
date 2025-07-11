@@ -55,12 +55,11 @@ class NodeController(
 				.from(EDGE).coerce(EDGE)
 					as Select<EdgeRecord> // coerce only gets us to ResultQuery<T> but union needs Select<T>
 		} else {
-			// if the requested root is NOT the absolute root, its ID exists in toId
+			// if the requested root is NOT the absolute root, its ID exists in toIds
 			// Psql will complain if we violate the UNIQUE(toId) constraint by unioning in a dummy row (go figure)
 			// so let's short-circuit that query to a SELECT WHEN false
 			jooq.selectFrom(EDGE).where(DSL.inline(false))
 		}
-
 		val resultQuery = jooq.selectFrom(EDGE).union(dummyRow)
 
 		// I estimate Records.intoHierarchy to run in O(r) time, where r is all stored rows.
@@ -69,8 +68,14 @@ class NodeController(
 		// NOTE: currently assumed that the table has only ONE noteworthy tree, so r is ~= n, where n tree.edges.count.
 		// This query will build *all* trees in the table, extracting root's subtree if root is not the absolute root.
 		// It chose this method to avoid the complexity of a depth-first recursive query but risks waste on other trees.
-		val cursor = resultQuery
-			.orderBy(EDGE.FROM_ID)
+		val e = EDGE.`as`("e")
+		val cursor = jooq.selectFrom(resultQuery.asTable(e))
+			.orderBy( // minimize allocs by having parent nodes ready before their children
+				e.TO_ID.eq(root).desc(), // prioritize root's key node
+				e.FROM_ID.eq(root).desc(), // prioritize children of root
+				e.TO_ID, // favor low key IDs, as those nodes are likely to have children
+				e.FROM_ID // more for completion; grouping rows by parent for locality probably helps more than asc/desc
+			).coerce(EDGE)
 			.fetchLazy()
 		val result = cursor
 			.collect(
