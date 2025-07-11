@@ -1,4 +1,4 @@
-package codes.abbott.TreeDemo
+package codes.abbott.treeDemo
 
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection

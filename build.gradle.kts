@@ -62,8 +62,8 @@ jooq {
 		generator {
 			name = "org.jooq.codegen.KotlinGenerator"
 			target {
-				packageName = "codes.abbott.TreeDemo.db"
-				directory = "src/main/kotlin/codes/abbott/TreeDemo/generated"
+				packageName = "codes.abbott.treeDemo.db"
+				directory = "src/main/kotlin/codes/abbott/treeDemo/generated"
 				//clean = true
 			}
 			database {

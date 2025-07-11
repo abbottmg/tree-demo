@@ -1,8 +1,9 @@
-package codes.abbott.TreeDemo
+package codes.abbott.treeDemo
 
-import codes.abbott.TreeDemo.db.public.tables.pojos.Edge
-import codes.abbott.TreeDemo.db.public.tables.records.EdgeRecord
-import codes.abbott.TreeDemo.db.public.tables.references.EDGE
+import codes.abbott.treeDemo.Node
+import codes.abbott.treeDemo.db.public.tables.pojos.Edge
+import codes.abbott.treeDemo.db.public.tables.records.EdgeRecord
+import codes.abbott.treeDemo.db.public.tables.references.EDGE
 import jakarta.servlet.http.HttpServletRequest
 import org.jooq.DSLContext
 import org.jooq.Records
@@ -13,7 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.net.URI
 
@@ -31,8 +37,8 @@ class EdgeController(
 
 	@GetMapping("/{from}/{to}")
 	fun getOne(
-		@PathVariable from: Long,
-		@PathVariable to: Long
+        @PathVariable from: Long,
+        @PathVariable to: Long
 	): ResponseEntity<Edge> {
 		val edge = jooq.selectFrom(EDGE)
 			.where(EDGE.FROM_ID.eq(from))
@@ -48,26 +54,35 @@ class EdgeController(
 	fun createEdge(
         @PathVariable from: Long,
         @PathVariable to: Long,
-		request: HttpServletRequest
+        request: HttpServletRequest
 	): ResponseEntity<Edge> {
 		try {
 			val record = EdgeRecord(fromId = from, toId = to)
 			val inserted = jooq.insertInto(EDGE).set(record).returning().fetchOneInto(Edge::class.java)
 			return ResponseEntity.created(URI.create(request.requestURI)).body(inserted!!)
 		} catch (_: DuplicateKeyException) {
-			throw ResponseStatusException(HttpStatus.CONFLICT, "Can't create edge: only one edge with toId $to may exist")
+			throw ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Can't create edge: only one edge with toId $to may exist"
+            )
 		} catch (e: DataAccessException) {
-			throw ResponseStatusException(HttpStatus.CONFLICT, "Can't create edge; a trigger exception occurred: ${e.message}")
+			throw ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Can't create edge; a trigger exception occurred: ${e.message}"
+            )
 		}
 		catch (e: Exception) {
-			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't create edge: ${e.javaClass.name} occurred,  ${e.message}")
+			throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Can't create edge: ${e.javaClass.name} occurred,  ${e.message}"
+            )
 		}
 	}
 
 	@DeleteMapping("/{from}/{to}")
 	fun deleteEdge(
-		@PathVariable from: Long,
-		@PathVariable to: Long
+        @PathVariable from: Long,
+        @PathVariable to: Long
 	): ResponseEntity<Void> {
 		val e = EDGE
 		val deleted = jooq.deleteFrom(e)
@@ -83,7 +98,7 @@ class EdgeController(
 
 	@GetMapping("/{root}/tree")
 	fun buildTree(
-		@PathVariable root: Long,
+        @PathVariable root: Long,
 	): ResponseEntity<Node> {
 		val rootExists = jooq.selectFrom(EDGE)
 			.where(EDGE.FROM_ID.eq(root))
@@ -127,7 +142,8 @@ class EdgeController(
 		// but I believe the query complexity may prevent in longer than linear time, and certainly be less readable
 		val result = resultQuery
 			.orderBy(EDGE.FROM_ID)
-			.collect(Records.intoHierarchy(
+			.collect(
+                Records.intoHierarchy(
 				{ it.toId },
 				{ if (it.toId == root) null else it.fromId },
 				{ Node(it.toId) },

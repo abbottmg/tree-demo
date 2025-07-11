@@ -1,4 +1,4 @@
-package codes.abbott.TreeDemo
+package codes.abbott.treeDemo
 
 import org.springframework.boot.fromApplication
 import org.springframework.boot.with

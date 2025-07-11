@@ -1,4 +1,4 @@
-package codes.abbott.TreeDemo
+package codes.abbott.treeDemo
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
