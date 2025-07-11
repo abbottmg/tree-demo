@@ -4,7 +4,6 @@ import codes.abbott.TreeDemo.db.public.tables.pojos.Edge
 import codes.abbott.TreeDemo.db.public.tables.records.EdgeRecord
 import codes.abbott.TreeDemo.db.public.tables.references.EDGE
 import jakarta.servlet.http.HttpServletRequest
-import java.net.URI
 import org.jooq.DSLContext
 import org.jooq.Records
 import org.jooq.Select
@@ -14,13 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.net.URI
 
 @RestController
 @RequestMapping("/api/edge")
@@ -68,7 +63,6 @@ class EdgeController(
 			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't create edge: ${e.javaClass.name} occurred,  ${e.message}")
 		}
 	}
-
 
 	@DeleteMapping("/{from}/{to}")
 	fun deleteEdge(
