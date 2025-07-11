@@ -91,5 +91,4 @@ class EdgeController(
 		}
 		return ResponseEntity.noContent().build()
 	}
-
 }
