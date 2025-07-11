@@ -3,8 +3,12 @@ package codes.abbott.TreeDemo
 import codes.abbott.TreeDemo.db.public.tables.pojos.Edge
 import codes.abbott.TreeDemo.db.public.tables.records.EdgeRecord
 import codes.abbott.TreeDemo.db.public.tables.references.EDGE
+import jakarta.servlet.http.HttpServletRequest
+import java.net.URI
 import org.jooq.DSLContext
+import org.jooq.exception.DataAccessException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -30,10 +34,21 @@ class EdgeController(
 	@PostMapping("/{from}/{to}")
 	fun createEdge(
         @PathVariable from: Long,
-        @PathVariable to: Long
-	) {
-		val record = EdgeRecord(fromId = from, toId = to)
-		jooq.insertInto(EDGE).set(record).execute()
+        @PathVariable to: Long,
+		request: HttpServletRequest
+	): ResponseEntity<Edge> {
+		try {
+			val record = EdgeRecord(fromId = from, toId = to)
+			val inserted = jooq.insertInto(EDGE).set(record).returning().fetchOneInto(Edge::class.java)
+			return ResponseEntity.created(URI.create(request.requestURI)).body(inserted!!)
+		} catch (e: DuplicateKeyException) {
+			throw ResponseStatusException(HttpStatus.CONFLICT, "Can't create edge: only one edge with toId ${to} may exist")
+		} catch (e: DataAccessException) {
+			throw ResponseStatusException(HttpStatus.CONFLICT, "Can't create edge; a trigger exception occurred: ${e.message}")
+		}
+		catch (e: Exception) {
+			throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't create edge: ${e.javaClass.name} occurred,  ${e.message}")
+		}
 	}
 
 
