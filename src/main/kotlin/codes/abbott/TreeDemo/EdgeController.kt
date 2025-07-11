@@ -107,18 +107,17 @@ class EdgeController(
 		In order to ensure the absolute root has a Node in our output, prepend a dummy row with its ID in toId
 		IFF the request is actually asking to start with the absolute root
 		 */
-		var dummyRow: Select<EdgeRecord>
-		if (rootInPrimary == null) { // this is the more common case
-			dummyRow = jooq.select(
+		val dummyRow: Select<EdgeRecord> = if (rootInPrimary == null) { // this is the more common case
+			jooq.select(
 				DSL.inline(0).`as`(EDGE.FROM_ID), // 0 is assumedly never used so won't display
 				DSL.inline(root).`as`(EDGE.TO_ID))
 				.from(EDGE).coerce(EDGE)
-				as Select<EdgeRecord> // coerce only gets us to ResultQuery<T> but union needs Select<T>
+					as Select<EdgeRecord> // coerce only gets us to ResultQuery<T> but union needs Select<T>
 		} else {
 			// if the requested root is NOT the absolute root, its ID exists in toId
 			// Psql will complain if we violate the UNIQUE(toId) constraint by unioning in a dummy row (go figure)
 			// so let's short-circuit that query to a SELECT WHEN false
-			dummyRow = jooq.selectFrom(EDGE).where(DSL.inline(false))
+			jooq.selectFrom(EDGE).where(DSL.inline(false))
 		}
 
 		val resultQuery = jooq.selectFrom(EDGE).union(dummyRow)
