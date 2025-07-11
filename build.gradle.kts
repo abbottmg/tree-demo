@@ -46,6 +46,14 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+sourceSets {
+    main {
+        kotlin {
+            srcDir(layout.buildDirectory.dir("/generated/src"))
+        }
+    }
+}
+
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
@@ -63,7 +71,7 @@ jooq {
 			name = "org.jooq.codegen.KotlinGenerator"
 			target {
 				packageName = "codes.abbott.treeDemo.db"
-				directory = "src/main/kotlin/codes/abbott/treeDemo/generated"
+				directory = "build/generated/src"
 				//clean = true
 			}
 			database {
