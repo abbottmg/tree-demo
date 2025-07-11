@@ -1,6 +1,5 @@
 package codes.abbott.treeDemo
 
-import codes.abbott.treeDemo.Node
 import codes.abbott.treeDemo.db.public.tables.pojos.Edge
 import codes.abbott.treeDemo.db.public.tables.records.EdgeRecord
 import codes.abbott.treeDemo.db.public.tables.references.EDGE
