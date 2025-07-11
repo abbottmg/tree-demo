@@ -69,8 +69,10 @@ class NodeController(
 		// NOTE: currently assumed that the table has only ONE noteworthy tree, so r is ~= n, where n tree.edges.count.
 		// This query will build *all* trees in the table, extracting root's subtree if root is not the absolute root.
 		// It chose this method to avoid the complexity of a depth-first recursive query but risks waste on other trees.
-		val result = resultQuery
+		val cursor = resultQuery
 			.orderBy(EDGE.FROM_ID)
+			.fetchLazy()
+		val result = cursor
 			.collect(
 				Records.intoHierarchy(
 					{ it.toId },
@@ -78,6 +80,7 @@ class NodeController(
 					{ Node(it.toId) },
 					{ parent, child -> parent.children.add(child) }))
 			.first { it.id == root }
+		cursor.close()
 
 		if (result == null) {
 			throw ResponseStatusException(HttpStatus.NOT_FOUND, "No tree found")
