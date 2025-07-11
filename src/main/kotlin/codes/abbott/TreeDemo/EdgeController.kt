@@ -5,12 +5,15 @@ import codes.abbott.TreeDemo.db.public.tables.records.EdgeRecord
 import codes.abbott.TreeDemo.db.public.tables.references.EDGE
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/edge")
@@ -38,12 +41,16 @@ class EdgeController(
 	fun deleteEdge(
 		@PathVariable from: Long,
 		@PathVariable to: Long
-	): List<Edge> {
+	): ResponseEntity<Void> {
 		val e = EDGE
-		return jooq.deleteFrom(e)
+		val deleted = jooq.deleteFrom(e)
 			.where(EDGE.FROM_ID.eq(from))
 			.and(EDGE.TO_ID.eq(to))
 			.returning()
 			.fetchInto(Edge::class.java)
+		if (deleted.isEmpty()) {
+			throw ResponseStatusException(HttpStatus.NOT_FOUND, "No edge found")
+		}
+		return ResponseEntity.noContent().build()
 	}
 }
