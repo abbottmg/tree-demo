@@ -54,8 +54,8 @@ class EdgeController(
 			val record = EdgeRecord(fromId = from, toId = to)
 			val inserted = jooq.insertInto(EDGE).set(record).returning().fetchOneInto(Edge::class.java)
 			return ResponseEntity.created(URI.create(request.requestURI)).body(inserted!!)
-		} catch (e: DuplicateKeyException) {
-			throw ResponseStatusException(HttpStatus.CONFLICT, "Can't create edge: only one edge with toId ${to} may exist")
+		} catch (_: DuplicateKeyException) {
+			throw ResponseStatusException(HttpStatus.CONFLICT, "Can't create edge: only one edge with toId $to may exist")
 		} catch (e: DataAccessException) {
 			throw ResponseStatusException(HttpStatus.CONFLICT, "Can't create edge; a trigger exception occurred: ${e.message}")
 		}
@@ -111,7 +111,7 @@ class EdgeController(
 		if (rootInPrimary == null) { // this is the more common case
 			dummyRow = jooq.select(
 				DSL.inline(0).`as`(EDGE.FROM_ID), // 0 is assumedly never used so won't display
-				DSL.inline(0).`as`(EDGE.TO_ID))
+				DSL.inline(root).`as`(EDGE.TO_ID))
 				.from(EDGE).coerce(EDGE)
 				as Select<EdgeRecord> // coerce only gets us to ResultQuery<T> but union needs Select<T>
 		} else {
