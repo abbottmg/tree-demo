@@ -33,8 +33,8 @@ class EdgeController(
 
 	@GetMapping("/{from}/{to}")
 	fun getOne(
-        @PathVariable from: Long,
-        @PathVariable to: Long
+		@PathVariable from: Long,
+		@PathVariable to: Long
 	): ResponseEntity<Edge> {
 		val edge = jooq.selectFrom(EDGE)
 			.where(EDGE.FROM_ID.eq(from))
@@ -48,9 +48,9 @@ class EdgeController(
 
 	@PostMapping("/{from}/{to}")
 	fun createEdge(
-        @PathVariable from: Long,
-        @PathVariable to: Long,
-        request: HttpServletRequest
+		@PathVariable from: Long,
+		@PathVariable to: Long,
+		request: HttpServletRequest
 	): ResponseEntity<Edge> {
 		try {
 			val record = EdgeRecord(fromId = from, toId = to)
@@ -58,27 +58,27 @@ class EdgeController(
 			return ResponseEntity.created(URI.create(request.requestURI)).body(inserted!!)
 		} catch (_: DuplicateKeyException) {
 			throw ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "Can't create edge: only one edge with toId $to may exist"
-            )
+				HttpStatus.CONFLICT,
+				"Can't create edge: only one edge with toId $to may exist"
+			)
 		} catch (e: DataAccessException) {
 			throw ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "Can't create edge; a trigger exception occurred: ${e.message}"
-            )
+				HttpStatus.CONFLICT,
+				"Can't create edge; a trigger exception occurred: ${e.message}"
+			)
 		}
 		catch (e: Exception) {
 			throw ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Can't create edge: ${e.javaClass.name} occurred,  ${e.message}"
-            )
+				HttpStatus.BAD_REQUEST,
+				"Can't create edge: ${e.javaClass.name} occurred,  ${e.message}"
+			)
 		}
 	}
 
 	@DeleteMapping("/{from}/{to}")
 	fun deleteEdge(
-        @PathVariable from: Long,
-        @PathVariable to: Long
+		@PathVariable from: Long,
+		@PathVariable to: Long
 	): ResponseEntity<Void> {
 		val e = EDGE
 		val deleted = jooq.deleteFrom(e)

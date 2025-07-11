@@ -47,11 +47,11 @@ dependencies {
 }
 
 sourceSets {
-    main {
-        kotlin {
-            srcDir(layout.buildDirectory.dir("/generated/src"))
-        }
-    }
+	main {
+		kotlin {
+			srcDir(layout.buildDirectory.dir("/generated/src"))
+		}
+	}
 }
 
 kotlin {
