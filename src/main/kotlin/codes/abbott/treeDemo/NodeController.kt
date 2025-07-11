@@ -66,6 +66,9 @@ class NodeController(
         // I estimate Records.intoHierarchy to run in O(r) time, where r is all stored rows.
         // This could be implemented as a stored SQL query with recursive CTEs, on a runtime optimized for data xforms
         // but I believe the query complexity may prevent in longer than linear time, and certainly be less readable
+        // NOTE: currently assumed that the table has only ONE noteworthy tree, so r is ~= n, where n tree.edges.count.
+        // This query will build *all* trees in the table, extracting root's subtree if root is not the absolute root.
+        // It chose this method to avoid the complexity of a depth-first recursive query but risks waste on other trees.
         val result = resultQuery
             .orderBy(EDGE.FROM_ID)
             .collect(
