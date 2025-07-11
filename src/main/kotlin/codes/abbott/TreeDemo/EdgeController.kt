@@ -34,6 +34,21 @@ class EdgeController(
 		return jooq.selectFrom(EDGE).fetchInto(Edge::class.java)
 	}
 
+	@GetMapping("/{from}/{to}")
+	fun getOne(
+		@PathVariable from: Long,
+		@PathVariable to: Long
+	): ResponseEntity<Edge> {
+		val edge = jooq.selectFrom(EDGE)
+			.where(EDGE.FROM_ID.eq(from))
+			.and(EDGE.TO_ID.eq(to))
+			.fetchOneInto(Edge::class.java)
+		if (edge == null) {
+			throw ResponseStatusException(HttpStatus.NOT_FOUND)
+		}
+		return ResponseEntity.ok(edge)
+	}
+
 	@PostMapping("/{from}/{to}")
 	fun createEdge(
         @PathVariable from: Long,
