@@ -63,7 +63,7 @@ class NodeController(
 
         val resultQuery = jooq.selectFrom(EDGE).union(dummyRow)
 
-        // I estimate Records.intoHierarchy to run in O(1) time
+        // I estimate Records.intoHierarchy to run in O(r) time, where r is all stored rows.
         // This could be implemented as a stored SQL query with recursive CTEs, on a runtime optimized for data xforms
         // but I believe the query complexity may prevent in longer than linear time, and certainly be less readable
         val result = resultQuery
